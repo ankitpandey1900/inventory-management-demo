@@ -1,12 +1,39 @@
 import React, { useState } from 'react';
 import { Search, Plus, Filter } from 'lucide-react';
-import { suppliers } from '../data/mockData';
+import { useAppData } from '../context/AppDataContext';
+import Modal from '../components/Modal';
 
 const Suppliers = () => {
+  const { suppliers, addSupplier } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
   
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [newSupName, setNewSupName] = useState('');
+  const [newSupPhone, setNewSupPhone] = useState('');
+
+  const filteredSuppliers = suppliers.filter(s => 
+    s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    s.phone.includes(searchTerm)
+  );
+
   const totalSuppliers = suppliers.length;
   const outstandingAmount = suppliers.reduce((acc, s) => acc + s.outstanding, 0);
+
+  const handleAddSupplier = (e) => {
+    e.preventDefault();
+    if (!newSupName) return;
+    addSupplier({
+      name: newSupName,
+      phone: newSupPhone || '-',
+      gstin: '-',
+      purchases: 0,
+      outstanding: 0,
+      lastPurchase: '-'
+    });
+    setModalOpen(false);
+    setNewSupName('');
+    setNewSupPhone('');
+  };
 
   return (
     <div>
@@ -15,7 +42,7 @@ const Suppliers = () => {
           <h1>Suppliers</h1>
           <p className="mb-0">Manage suppliers and payables</p>
         </div>
-        <button className="btn btn-primary">
+        <button className="btn btn-primary" onClick={() => setModalOpen(true)}>
           <Plus size={18} /> Add Supplier
         </button>
       </div>
@@ -28,8 +55,8 @@ const Suppliers = () => {
       </div>
 
       <div className="card">
-        <div className="flex justify-between mb-4 gap-4">
-          <div style={{ flex: 1, position: 'relative' }}>
+        <div className="flex justify-between mb-4 gap-4 flex-wrap">
+          <div style={{ flex: 1, position: 'relative', minWidth: '250px' }}>
             <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
@@ -59,7 +86,7 @@ const Suppliers = () => {
               </tr>
             </thead>
             <tbody>
-              {suppliers.map(s => (
+              {filteredSuppliers.map(s => (
                 <tr key={s.id}>
                   <td style={{ fontWeight: 500, color: 'var(--primary)' }}>{s.name}</td>
                   <td>{s.phone}</td>
@@ -80,6 +107,23 @@ const Suppliers = () => {
           </table>
         </div>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} title="Add New Supplier">
+        <form onSubmit={handleAddSupplier}>
+          <div className="mb-4">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Supplier Name *</label>
+            <input type="text" className="input" required value={newSupName} onChange={e => setNewSupName(e.target.value)} />
+          </div>
+          <div className="mb-6">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Phone Number</label>
+            <input type="text" className="input" value={newSupPhone} onChange={e => setNewSupPhone(e.target.value)} />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button type="button" className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Save Supplier</button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

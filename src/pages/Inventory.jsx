@@ -1,15 +1,49 @@
 import React, { useState } from 'react';
-import { Search, Plus, Filter, Download, ArrowUpRight } from 'lucide-react';
-import { products } from '../data/mockData';
+import { Search, Plus, Filter, Download } from 'lucide-react';
+import { useAppData } from '../context/AppDataContext';
 import { Link } from 'react-router-dom';
+import Modal from '../components/Modal';
 
 const Inventory = () => {
+  const { products, addProduct } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const [isProductModalOpen, setProductModalOpen] = useState(false);
+  const [newProdName, setNewProdName] = useState('');
+  const [newProdSku, setNewProdSku] = useState('');
+  const [newProdPrice, setNewProdPrice] = useState('');
+
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const totalSKUs = products.length;
   const totalStockQty = products.reduce((acc, p) => acc + p.stock, 0);
   const lowStockCount = products.filter(p => p.stock <= p.reorderLevel).length;
   const inventoryValue = products.reduce((acc, p) => acc + (p.stock * p.purchasePrice), 0);
+
+  const handleAddProduct = (e) => {
+    e.preventDefault();
+    if (!newProdName || !newProdSku) return;
+    
+    addProduct({
+      name: newProdName,
+      sku: newProdSku.toUpperCase(),
+      brand: 'Generic',
+      category: 'Accessories',
+      stock: 0,
+      reorderLevel: 10,
+      purchasePrice: parseFloat(newProdPrice) || 0,
+      sellingPrice: parseFloat(newProdPrice) * 1.5 || 0,
+      location: 'Main Warehouse',
+      status: 'Low Stock'
+    });
+    setProductModalOpen(false);
+    setNewProdName('');
+    setNewProdSku('');
+    setNewProdPrice('');
+  };
 
   return (
     <div>
@@ -19,10 +53,10 @@ const Inventory = () => {
           <p className="mb-0">View and manage your product stock</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn btn-secondary">
+          <Link to="/import" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
             <Download size={18} /> Import Excel
-          </button>
-          <button className="btn btn-primary">
+          </Link>
+          <button className="btn btn-primary" onClick={() => setProductModalOpen(true)}>
             <Plus size={18} /> Add Product
           </button>
         </div>
@@ -36,13 +70,13 @@ const Inventory = () => {
       </div>
 
       <div className="card">
-        <div className="flex justify-between mb-4 gap-4">
-          <div style={{ flex: 1, position: 'relative' }}>
+        <div className="flex justify-between mb-4 gap-4 flex-wrap">
+          <div style={{ flex: 1, position: 'relative', minWidth: '250px' }}>
             <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
               className="input" 
-              placeholder="Search by SKU, product name, brand, model..." 
+              placeholder="Search by SKU, product name..." 
               style={{ paddingLeft: '2.5rem' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -81,7 +115,7 @@ const Inventory = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map(p => (
+              {filteredProducts.map(p => (
                 <tr key={p.id}>
                   <td style={{ fontWeight: 500 }}>{p.sku}</td>
                   <td>{p.name}</td>
@@ -98,7 +132,7 @@ const Inventory = () => {
                     </span>
                   </td>
                   <td>
-                    <Link to={`/inventory/product/${p.id}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                    <Link to={`/inventory/product/${p.id}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', textDecoration: 'none' }}>
                       View
                     </Link>
                   </td>
@@ -108,6 +142,28 @@ const Inventory = () => {
           </table>
         </div>
       </div>
+
+      <Modal isOpen={isProductModalOpen} onClose={() => setProductModalOpen(false)} title="Add New Product">
+        <form onSubmit={handleAddProduct}>
+          <div className="mb-4">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Product Name *</label>
+            <input type="text" className="input" required value={newProdName} onChange={e => setNewProdName(e.target.value)} />
+          </div>
+          <div className="mb-4">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>SKU *</label>
+            <input type="text" className="input" required value={newProdSku} onChange={e => setNewProdSku(e.target.value)} />
+          </div>
+          <div className="mb-6">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Purchase Price (₹)</label>
+            <input type="number" className="input" value={newProdPrice} onChange={e => setNewProdPrice(e.target.value)} />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button type="button" className="btn btn-secondary" onClick={() => setProductModalOpen(false)}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Save Product</button>
+          </div>
+        </form>
+      </Modal>
+
     </div>
   );
 };

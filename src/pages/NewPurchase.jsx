@@ -1,25 +1,89 @@
-import React, { useState } from 'react';
-import { Search, Save, ScanLine, Trash2 } from 'lucide-react';
-import { products, suppliers } from '../data/mockData';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Save, ScanLine, Trash2, Plus } from 'lucide-react';
+import { useAppData } from '../context/AppDataContext';
+import Modal from '../components/Modal';
 
 const NewPurchase = () => {
-  const [selectedSupplier, setSelectedSupplier] = useState('s1');
-  const [items, setItems] = useState([
-    { id: '1', product: products[0], qty: 100, purchasePrice: 80, gstPercent: 18 },
-    { id: '2', product: products[1], qty: 200, purchasePrice: 20, gstPercent: 18 },
-    { id: '3', product: products[2], qty: 50, purchasePrice: 150, gstPercent: 18 },
-    { id: '4', product: products[3], qty: 150, purchasePrice: 10, gstPercent: 18 },
-    { id: '5', product: products[4], qty: 100, purchasePrice: 40, gstPercent: 18 },
-  ]);
+  const { products, suppliers, addSupplier } = useAppData();
+  
+  const [selectedSupplier, setSelectedSupplier] = useState(suppliers[0]?.id || '');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  
+  const [items, setItems] = useState([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  
+  const [isSupplierModalOpen, setSupplierModalOpen] = useState(false);
+  const [newSupName, setNewSupName] = useState('');
+
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  ).slice(0, 5);
+
+  const handleProductSelect = (product) => {
+    const existing = items.find(i => i.product.id === product.id);
+    if (existing) {
+      handleQtyChange(existing.id, existing.qty + 1);
+    } else {
+      setItems([...items, { id: Date.now().toString(), product, qty: 10, purchasePrice: product.purchasePrice, gstPercent: 18 }]);
+    }
+    setSearchTerm('');
+    setShowDropdown(false);
+  };
+
+  const handleQtyChange = (id, newQty) => {
+    setItems(items.map(i => i.id === id ? { ...i, qty: parseInt(newQty) || 0 } : i));
+  };
+
+  const handlePriceChange = (id, newPrice) => {
+    setItems(items.map(i => i.id === id ? { ...i, purchasePrice: parseFloat(newPrice) || 0 } : i));
+  };
+
+  const handleGstChange = (id, newGst) => {
+    setItems(items.map(i => i.id === id ? { ...i, gstPercent: parseInt(newGst) || 0 } : i));
+  };
+
+  const handleRemove = (id) => {
+    setItems(items.filter(i => i.id !== id));
+  };
 
   const totalAmount = items.reduce((acc, item) => acc + (item.qty * item.purchasePrice), 0);
   const totalGst = items.reduce((acc, item) => acc + ((item.qty * item.purchasePrice) * (item.gstPercent / 100)), 0);
   const grandTotal = totalAmount + totalGst;
 
   const handleSave = () => {
+    if (items.length === 0) return;
     setSaveSuccess(true);
+    setItems([]);
     setTimeout(() => setSaveSuccess(false), 3000);
+  };
+
+  const handleAddSupplier = (e) => {
+    e.preventDefault();
+    if (!newSupName) return;
+    addSupplier({
+      name: newSupName,
+      phone: '-',
+      gstin: '-',
+      purchases: 0,
+      outstanding: 0,
+      lastPurchase: '-'
+    });
+    setSupplierModalOpen(false);
+    setNewSupName('');
   };
 
   return (
@@ -31,40 +95,65 @@ const NewPurchase = () => {
 
       {saveSuccess && (
         <div style={{ backgroundColor: 'var(--success-bg)', color: 'var(--success)', padding: '1rem', borderRadius: '6px', marginBottom: '1.5rem', border: '1px solid var(--success)', fontWeight: 500 }}>
-          Purchase saved successfully. Stock updated.
+          Purchase saved successfully. Stock updated (simulated).
         </div>
       )}
 
       <div className="grid" style={{ gridTemplateColumns: '3fr 1fr', gap: '1.5rem' }}>
         <div className="card">
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <div style={{ gridColumn: 'span 2' }}>
+          <div className="flex gap-4 mb-6 flex-wrap">
+            <div style={{ flex: 1, minWidth: '200px' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Supplier</label>
-              <select className="select" value={selectedSupplier} onChange={(e) => setSelectedSupplier(e.target.value)}>
-                {suppliers.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select className="select" value={selectedSupplier} onChange={(e) => setSelectedSupplier(e.target.value)}>
+                  {suppliers.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+                <button className="btn btn-secondary" onClick={() => setSupplierModalOpen(true)} style={{ padding: '0 0.5rem' }}>
+                  <Plus size={18} />
+                </button>
+              </div>
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Purchase Invoice No.</label>
-              <input type="text" className="input" defaultValue="PUR-2026-000056" />
+              <input type="text" className="input" defaultValue={`PUR-${Date.now().toString().slice(-6)}`} />
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Invoice Date</label>
-              <input type="date" className="input" defaultValue="2026-09-21" />
+              <input type="date" className="input" defaultValue={new Date().toISOString().split('T')[0]} />
             </div>
           </div>
 
-          <div className="flex gap-4 mb-6">
-            <div style={{ flex: 1, position: 'relative' }}>
+          <div className="flex gap-4 mb-6 flex-wrap">
+            <div style={{ flex: 1, position: 'relative', minWidth: '250px' }} ref={searchRef}>
               <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input 
                 type="text" 
                 className="input" 
-                placeholder="Search product by name, SKU, or scan barcode..." 
+                placeholder="Search product by name, SKU..." 
                 style={{ paddingLeft: '2.5rem' }}
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setShowDropdown(true);
+                }}
+                onFocus={() => setShowDropdown(true)}
               />
+              {showDropdown && searchTerm && (
+                <div className="search-dropdown">
+                  {filteredProducts.length > 0 ? (
+                    filteredProducts.map(p => (
+                      <div key={p.id} className="search-item" onClick={() => handleProductSelect(p)}>
+                        <div style={{ fontWeight: 500 }}>{p.name}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>SKU: {p.sku} | Cost: ₹{p.purchasePrice}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ padding: '1rem', color: 'var(--text-muted)' }}>No products found.</div>
+                  )}
+                </div>
+              )}
             </div>
             <button className="btn btn-secondary">
               <ScanLine size={18} /> Scan Barcode
@@ -85,18 +174,44 @@ const NewPurchase = () => {
                 </tr>
               </thead>
               <tbody>
+                {items.length === 0 && (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                      Search and add products to the purchase order.
+                    </td>
+                  </tr>
+                )}
                 {items.map((item) => (
                   <tr key={item.id}>
                     <td>{item.product.name}</td>
                     <td>{item.product.sku}</td>
                     <td>
-                      <input type="number" className="input" style={{ padding: '0.25rem 0.5rem' }} defaultValue={item.qty} />
+                      <input 
+                        type="number" 
+                        className="input" 
+                        style={{ padding: '0.25rem 0.5rem' }} 
+                        value={item.qty}
+                        onChange={(e) => handleQtyChange(item.id, e.target.value)}
+                        min="1"
+                      />
                     </td>
                     <td>
-                      <input type="number" className="input" style={{ padding: '0.25rem 0.5rem' }} defaultValue={item.purchasePrice} />
+                      <input 
+                        type="number" 
+                        className="input" 
+                        style={{ padding: '0.25rem 0.5rem' }} 
+                        value={item.purchasePrice}
+                        onChange={(e) => handlePriceChange(item.id, e.target.value)}
+                        min="0"
+                      />
                     </td>
                     <td>
-                      <select className="select" style={{ padding: '0.25rem 0.5rem' }} defaultValue={item.gstPercent}>
+                      <select 
+                        className="select" 
+                        style={{ padding: '0.25rem 0.5rem' }} 
+                        value={item.gstPercent}
+                        onChange={(e) => handleGstChange(item.id, e.target.value)}
+                      >
                         <option value="5">5%</option>
                         <option value="12">12%</option>
                         <option value="18">18%</option>
@@ -107,7 +222,10 @@ const NewPurchase = () => {
                       ₹{(item.qty * item.purchasePrice).toLocaleString()}
                     </td>
                     <td style={{ textAlign: 'center' }}>
-                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)' }}>
+                      <button 
+                        onClick={() => handleRemove(item.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)' }}
+                      >
                         <Trash2 size={18} />
                       </button>
                     </td>
@@ -153,16 +271,16 @@ const NewPurchase = () => {
 
           <div className="mb-4">
             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Paid Amount</label>
-            <input type="text" className="input" defaultValue={`₹${grandTotal.toLocaleString()}`} />
+            <input type="text" className="input" value={`₹${grandTotal.toLocaleString()}`} readOnly />
           </div>
           
-          <div className="mb-6">
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Reference / UTR No.</label>
-            <input type="text" className="input" placeholder="Enter reference no." />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <button className="btn btn-primary w-full" onClick={handleSave} style={{ padding: '0.75rem', fontSize: '1rem' }}>
+          <div className="flex flex-col gap-3 mt-6">
+            <button 
+              className="btn btn-primary w-full" 
+              onClick={handleSave} 
+              style={{ padding: '0.75rem', fontSize: '1rem', opacity: items.length === 0 ? 0.5 : 1, cursor: items.length === 0 ? 'not-allowed' : 'pointer' }}
+              disabled={items.length === 0}
+            >
               <Save size={18} /> Save Purchase
             </button>
             <button className="btn btn-secondary w-full" style={{ padding: '0.75rem' }}>
@@ -170,12 +288,22 @@ const NewPurchase = () => {
             </button>
           </div>
           
-          <p style={{ fontSize: '0.75rem', textAlign: 'center', marginTop: '1rem', color: 'var(--text-muted)' }}>
-            Stock will be updated automatically after saving the purchase.
-          </p>
-
         </div>
       </div>
+
+      <Modal isOpen={isSupplierModalOpen} onClose={() => setSupplierModalOpen(false)} title="Add New Supplier">
+        <form onSubmit={handleAddSupplier}>
+          <div className="mb-4">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Supplier Name *</label>
+            <input type="text" className="input" required value={newSupName} onChange={e => setNewSupName(e.target.value)} />
+          </div>
+          <div className="flex justify-end gap-3 mt-6">
+            <button type="button" className="btn btn-secondary" onClick={() => setSupplierModalOpen(false)}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Save Supplier</button>
+          </div>
+        </form>
+      </Modal>
+
     </div>
   );
 };

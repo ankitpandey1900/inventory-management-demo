@@ -16,8 +16,8 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import { recentTransactions, products } from '../data/mockData';
-import { Link } from 'react-router-dom';
+import { useAppData } from '../context/AppDataContext';
+import { Link, useNavigate } from 'react-router-dom';
 
 const data = [
   { name: 'Mon', sales: 4000 },
@@ -30,7 +30,13 @@ const data = [
 ];
 
 const Dashboard = () => {
-  const lowStockProducts = products.filter(p => p.stock <= p.reorderLevel);
+  const { products, transactions, salesInvoices } = useAppData();
+  const navigate = useNavigate();
+  
+  const lowStockProducts = products.filter(p => p.stock <= p.reorderLevel).slice(0, 5);
+
+  const todaySales = salesInvoices.reduce((acc, inv) => acc + inv.amount, 0); // Simplified for demo
+  const stockValue = products.reduce((acc, p) => acc + (p.stock * p.purchasePrice), 0);
 
   return (
     <div>
@@ -39,17 +45,17 @@ const Dashboard = () => {
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-6 mb-6">
         <SummaryCard 
-          title="Today's Sales" 
-          value="₹1,24,850" 
-          subtitle="12 invoices" 
+          title="Total Sales (Demo)" 
+          value={`₹${todaySales.toLocaleString()}`} 
+          subtitle={`${salesInvoices.length} invoices`} 
           icon={<TrendingUp size={24} color="#16a34a" />}
           trend="+15%"
           trendUp={true}
         />
         <SummaryCard 
           title="Total Stock Value" 
-          value="₹18,75,320" 
-          subtitle="12,480 items" 
+          value={`₹${stockValue.toLocaleString()}`} 
+          subtitle={`${products.length} items`} 
           icon={<Package size={24} color="#2563eb" />}
         />
         <SummaryCard 
@@ -88,19 +94,19 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="card flex-col gap-4">
           <h2 className="mb-2">Quick Actions</h2>
-          <Link to="/sales/create" className="btn btn-primary w-full" style={{ justifyContent: 'center', padding: '0.75rem' }}>
+          <Link to="/sales/create" className="btn btn-primary w-full" style={{ justifyContent: 'center', padding: '0.75rem', textDecoration: 'none' }}>
             New Sale
           </Link>
-          <Link to="/purchase/new" className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem' }}>
+          <Link to="/purchase/new" className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem', textDecoration: 'none' }}>
             Add Purchase
           </Link>
-          <button className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem' }}>
-            Add Product
+          <button onClick={() => navigate('/inventory')} className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem' }}>
+            Add Product (Go to Inventory)
           </button>
-          <Link to="/import" className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem' }}>
+          <Link to="/import" className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem', textDecoration: 'none' }}>
             Import Excel
           </Link>
-          <Link to="/reports" className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem' }}>
+          <Link to="/reports" className="btn btn-secondary w-full" style={{ justifyContent: 'center', padding: '0.75rem', textDecoration: 'none' }}>
             View Reports
           </Link>
         </div>
@@ -153,7 +159,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {recentTransactions.map((t, idx) => (
+                {transactions.slice(0, 5).map((t, idx) => (
                   <tr key={idx}>
                     <td>{t.date}</td>
                     <td>

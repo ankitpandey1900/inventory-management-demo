@@ -1,14 +1,44 @@
 import React, { useState } from 'react';
 import { Search, Plus, Filter } from 'lucide-react';
-import { customers } from '../data/mockData';
+import { useAppData } from '../context/AppDataContext';
+import Modal from '../components/Modal';
 
 const Customers = () => {
+  const { customers, addCustomer } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
   
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [newCustName, setNewCustName] = useState('');
+  const [newCustPhone, setNewCustPhone] = useState('');
+  const [newCustGstin, setNewCustGstin] = useState('');
+
+  const filteredCustomers = customers.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.phone.includes(searchTerm)
+  );
+
   const totalCustomers = customers.length;
   const activeCustomers = customers.filter(c => c.purchases > 0).length;
   const outstandingAmount = customers.reduce((acc, c) => acc + c.outstanding, 0);
   const creditCustomers = customers.filter(c => c.outstanding > 0).length;
+
+  const handleAddCustomer = (e) => {
+    e.preventDefault();
+    if (!newCustName) return;
+    
+    addCustomer({
+      name: newCustName,
+      phone: newCustPhone || '-',
+      gstin: newCustGstin || '-',
+      purchases: 0,
+      outstanding: 0,
+      lastPurchase: '-'
+    });
+    setModalOpen(false);
+    setNewCustName('');
+    setNewCustPhone('');
+    setNewCustGstin('');
+  };
 
   return (
     <div>
@@ -17,7 +47,7 @@ const Customers = () => {
           <h1>Customers</h1>
           <p className="mb-0">Manage customer records and outstanding balances</p>
         </div>
-        <button className="btn btn-primary">
+        <button className="btn btn-primary" onClick={() => setModalOpen(true)}>
           <Plus size={18} /> Add Customer
         </button>
       </div>
@@ -30,8 +60,8 @@ const Customers = () => {
       </div>
 
       <div className="card">
-        <div className="flex justify-between mb-4 gap-4">
-          <div style={{ flex: 1, position: 'relative' }}>
+        <div className="flex justify-between mb-4 gap-4 flex-wrap">
+          <div style={{ flex: 1, position: 'relative', minWidth: '250px' }}>
             <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
@@ -61,7 +91,7 @@ const Customers = () => {
               </tr>
             </thead>
             <tbody>
-              {customers.map(c => (
+              {filteredCustomers.map(c => (
                 <tr key={c.id}>
                   <td style={{ fontWeight: 500, color: 'var(--primary)' }}>{c.name}</td>
                   <td>{c.phone}</td>
@@ -82,6 +112,27 @@ const Customers = () => {
           </table>
         </div>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} title="Add New Customer">
+        <form onSubmit={handleAddCustomer}>
+          <div className="mb-4">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Customer Name *</label>
+            <input type="text" className="input" required value={newCustName} onChange={e => setNewCustName(e.target.value)} />
+          </div>
+          <div className="mb-4">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Phone Number</label>
+            <input type="text" className="input" value={newCustPhone} onChange={e => setNewCustPhone(e.target.value)} />
+          </div>
+          <div className="mb-6">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>GSTIN</label>
+            <input type="text" className="input" value={newCustGstin} onChange={e => setNewCustGstin(e.target.value)} />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button type="button" className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Save Customer</button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

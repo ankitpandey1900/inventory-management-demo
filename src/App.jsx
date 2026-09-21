@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AppDataProvider } from './context/AppDataContext';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import CreateSale from './pages/CreateSale';
@@ -15,25 +16,27 @@ import Settings from './pages/Settings';
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/sales/create" element={<CreateSale />} />
-          <Route path="/sales/invoices" element={<SalesInvoices />} />
-          <Route path="/purchase/new" element={<NewPurchase />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/inventory/product/:id" element={<ProductDetails />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/suppliers" element={<Suppliers />} />
-          <Route path="/payments" element={<Payments />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/import" element={<ExcelImport />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <AppDataProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/sales/create" element={<CreateSale />} />
+            <Route path="/sales/invoices" element={<SalesInvoices />} />
+            <Route path="/purchase/new" element={<NewPurchase />} />
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/inventory/product/:id" element={<ProductDetails />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/import" element={<ExcelImport />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </AppDataProvider>
   );
 }
 
