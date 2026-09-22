@@ -364,12 +364,9 @@ p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
     overflow-x: hidden;
   }
   
-  .grid-cols-4, .grid-cols-2 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  /* React injects grid-template-columns inline */
-  .grid[style*="grid-template-columns"] {
+  .grid,
+  .grid-cols-4, 
+  .grid-cols-2 {
     grid-template-columns: 1fr !important;
   }
   
@@ -407,6 +404,16 @@ p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
   /* Make sure internal card flex containers stack if they are form actions */
   .flex.gap-4.mb-6.flex-wrap {
     flex-direction: column;
+  }
+  
+  /* Tabs and Steppers and button groups */
+  .flex.gap-4, .flex.gap-3 {
+    flex-wrap: wrap;
+  }
+
+  .flex.gap-3 > .btn, .flex.gap-4 > .btn {
+    flex: 1;
+    min-width: calc(50% - 1rem);
   }
   
   .modal-content {
