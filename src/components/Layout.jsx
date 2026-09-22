@@ -113,7 +113,7 @@ const Layout = ({ children }) => {
               <Menu size={24} />
             </button>
             <div style={{ fontSize: '0.875rem', color: '#64748b', display: 'none' }} className="desktop-date">
-              {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              {`${String(new Date().getDate()).padStart(2, '0')}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${new Date().getFullYear()}`}
             </div>
           </div>
           <div className="flex items-center gap-4">

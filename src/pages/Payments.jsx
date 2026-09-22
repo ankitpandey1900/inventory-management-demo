@@ -47,7 +47,7 @@ const Payments = () => {
               </thead>
               <tbody>
                 <tr>
-                  <td>2026-09-21</td>
+                  <td>21-09-2026</td>
                   <td style={{ color: 'var(--primary)' }}>Walk-in Customer</td>
                   <td>INV-001</td>
                   <td style={{ fontWeight: 600, color: 'var(--success)' }}>₹240</td>
@@ -55,7 +55,7 @@ const Payments = () => {
                   <td>-</td>
                 </tr>
                 <tr>
-                  <td>2026-09-20</td>
+                  <td>20-09-2026</td>
                   <td style={{ color: 'var(--primary)' }}>Mobile Planet</td>
                   <td>INV-003</td>
                   <td style={{ fontWeight: 600, color: 'var(--success)' }}>₹1,200</td>
@@ -63,7 +63,7 @@ const Payments = () => {
                   <td>UPI/987654321</td>
                 </tr>
                 <tr>
-                  <td>2026-09-19</td>
+                  <td>19-09-2026</td>
                   <td style={{ color: 'var(--primary)' }}>Gadget Hub</td>
                   <td>INV-004</td>
                   <td style={{ fontWeight: 600, color: 'var(--success)' }}>₹3,200</td>
@@ -90,7 +90,7 @@ const Payments = () => {
               </thead>
               <tbody>
                 <tr>
-                  <td>2026-09-20</td>
+                  <td>20-09-2026</td>
                   <td style={{ color: 'var(--primary)' }}>Shree Telecom</td>
                   <td>PUR-056</td>
                   <td style={{ fontWeight: 600, color: 'var(--danger)' }}>₹15,000</td>
@@ -98,7 +98,7 @@ const Payments = () => {
                   <td>RTGS/HDFC000123</td>
                 </tr>
                 <tr>
-                  <td>2026-09-15</td>
+                  <td>15-09-2026</td>
                   <td style={{ color: 'var(--primary)' }}>Mega Accessories</td>
                   <td>PUR-050</td>
                   <td style={{ fontWeight: 600, color: 'var(--danger)' }}>₹8,500</td>

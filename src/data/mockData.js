@@ -12,28 +12,28 @@ export const products = [
 ];
 
 export const customers = [
-  { id: 'c1', name: 'Walk-in Customer', phone: '-', gstin: '-', purchases: 15, outstanding: 0, lastPurchase: '2026-09-20' },
-  { id: 'c2', name: 'Tech World', phone: '9876543210', gstin: '27AADCB2230M1Z2', purchases: 45, outstanding: 12500, lastPurchase: '2026-09-18' },
-  { id: 'c3', name: 'Mobile Planet', phone: '9876543211', gstin: '27AADCB2230M1Z3', purchases: 12, outstanding: 4200, lastPurchase: '2026-09-19' },
-  { id: 'c4', name: 'Gadget Hub', phone: '9876543212', gstin: '27AADCB2230M1Z4', purchases: 8, outstanding: 0, lastPurchase: '2026-09-10' },
+  { id: 'c1', name: 'Walk-in Customer', phone: '-', gstin: '-', purchases: 15, outstanding: 0, lastPurchase: '20-09-2026' },
+  { id: 'c2', name: 'Tech World', phone: '9876543210', gstin: '27AADCB2230M1Z2', purchases: 45, outstanding: 12500, lastPurchase: '18-09-2026' },
+  { id: 'c3', name: 'Mobile Planet', phone: '9876543211', gstin: '27AADCB2230M1Z3', purchases: 12, outstanding: 4200, lastPurchase: '19-09-2026' },
+  { id: 'c4', name: 'Gadget Hub', phone: '9876543212', gstin: '27AADCB2230M1Z4', purchases: 8, outstanding: 0, lastPurchase: '10-09-2026' },
 ];
 
 export const suppliers = [
-  { id: 's1', name: 'Shree Telecom', phone: '8876543210', gstin: '07BBDCB2230M1Z2', purchases: 120, outstanding: 45000, lastPurchase: '2026-09-15' },
-  { id: 's2', name: 'Mega Accessories', phone: '8876543211', gstin: '07BBDCB2230M1Z3', purchases: 65, outstanding: 12000, lastPurchase: '2026-09-10' },
-  { id: 's3', name: 'China Imports Ltd', phone: '8876543212', gstin: '07BBDCB2230M1Z4', purchases: 230, outstanding: 0, lastPurchase: '2026-09-01' },
+  { id: 's1', name: 'Shree Telecom', phone: '8876543210', gstin: '07BBDCB2230M1Z2', purchases: 120, outstanding: 45000, lastPurchase: '15-09-2026' },
+  { id: 's2', name: 'Mega Accessories', phone: '8876543211', gstin: '07BBDCB2230M1Z3', purchases: 65, outstanding: 12000, lastPurchase: '10-09-2026' },
+  { id: 's3', name: 'China Imports Ltd', phone: '8876543212', gstin: '07BBDCB2230M1Z4', purchases: 230, outstanding: 0, lastPurchase: '01-09-2026' },
 ];
 
 export const salesInvoices = [
-  { id: 'INV-001', date: '2026-09-21', customer: 'Walk-in Customer', items: 2, amount: 240, payment: 'Cash', status: 'Paid' },
-  { id: 'INV-002', date: '2026-09-21', customer: 'Tech World', items: 15, amount: 4500, payment: 'Credit', status: 'Unpaid' },
-  { id: 'INV-003', date: '2026-09-20', customer: 'Mobile Planet', items: 5, amount: 1200, payment: 'UPI', status: 'Paid' },
-  { id: 'INV-004', date: '2026-09-19', customer: 'Gadget Hub', items: 8, amount: 3200, payment: 'Bank Transfer', status: 'Paid' },
+  { id: 'INV-001', date: '21-09-2026', customer: 'Walk-in Customer', items: 2, amount: 240, payment: 'Cash', status: 'Paid' },
+  { id: 'INV-002', date: '21-09-2026', customer: 'Tech World', items: 15, amount: 4500, payment: 'Credit', status: 'Unpaid' },
+  { id: 'INV-003', date: '20-09-2026', customer: 'Mobile Planet', items: 5, amount: 1200, payment: 'UPI', status: 'Paid' },
+  { id: 'INV-004', date: '19-09-2026', customer: 'Gadget Hub', items: 8, amount: 3200, payment: 'Bank Transfer', status: 'Paid' },
 ];
 
 export const recentTransactions = [
-  { date: '2026-09-21', type: 'Sale', invoiceNo: 'INV-001', entity: 'Walk-in Customer', amount: 240, status: 'Completed' },
-  { date: '2026-09-21', type: 'Sale', invoiceNo: 'INV-002', entity: 'Tech World', amount: 4500, status: 'Pending' },
-  { date: '2026-09-20', type: 'Purchase', invoiceNo: 'PUR-056', entity: 'Shree Telecom', amount: 15000, status: 'Completed' },
-  { date: '2026-09-20', type: 'Sale', invoiceNo: 'INV-003', entity: 'Mobile Planet', amount: 1200, status: 'Completed' },
+  { date: '21-09-2026', type: 'Sale', invoiceNo: 'INV-001', entity: 'Walk-in Customer', amount: 240, status: 'Completed' },
+  { date: '21-09-2026', type: 'Sale', invoiceNo: 'INV-002', entity: 'Tech World', amount: 4500, status: 'Pending' },
+  { date: '20-09-2026', type: 'Purchase', invoiceNo: 'PUR-056', entity: 'Shree Telecom', amount: 15000, status: 'Completed' },
+  { date: '20-09-2026', type: 'Sale', invoiceNo: 'INV-003', entity: 'Mobile Planet', amount: 1200, status: 'Completed' },
 ];

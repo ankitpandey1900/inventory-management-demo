@@ -125,21 +125,21 @@ const ProductDetails = () => {
                   </thead>
                   <tbody>
                     <tr>
-                      <td>2026-09-20</td>
+                      <td>20-09-2026</td>
                       <td><span className="badge badge-success">Purchase</span></td>
                       <td>PUR-056</td>
                       <td style={{ color: 'var(--success)', fontWeight: 600 }}>+500</td>
                       <td>{product.stock}</td>
                     </tr>
                     <tr>
-                      <td>2026-09-19</td>
+                      <td>19-09-2026</td>
                       <td><span className="badge badge-warning">Sale</span></td>
                       <td>INV-045</td>
                       <td style={{ color: 'var(--danger)', fontWeight: 600 }}>-50</td>
                       <td>{product.stock - 500}</td>
                     </tr>
                     <tr>
-                      <td>2026-09-15</td>
+                      <td>15-09-2026</td>
                       <td><span className="badge badge-warning">Sale</span></td>
                       <td>INV-012</td>
                       <td style={{ color: 'var(--danger)', fontWeight: 600 }}>-120</td>
@@ -164,14 +164,14 @@ const ProductDetails = () => {
                   </thead>
                   <tbody>
                     <tr>
-                      <td>2026-09-19</td>
+                      <td>19-09-2026</td>
                       <td>INV-045</td>
                       <td>Tech World</td>
                       <td>50</td>
                       <td>₹{(50 * product.sellingPrice).toLocaleString()}</td>
                     </tr>
                     <tr>
-                      <td>2026-09-15</td>
+                      <td>15-09-2026</td>
                       <td>INV-012</td>
                       <td>Mobile Planet</td>
                       <td>120</td>

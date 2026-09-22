@@ -29,9 +29,12 @@ export const AppDataProvider = ({ children }) => {
   };
 
   const addSale = (sale) => {
+    const d = new Date();
+    const formattedDate = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+    
     const newInvoice = {
       id: `INV-00${salesInvoices.length + 1}`,
-      date: new Date().toISOString().split('T')[0],
+      date: formattedDate,
       customer: customers.find(c => c.id === sale.customerId)?.name || 'Walk-in',
       items: sale.items.length,
       amount: sale.total,
