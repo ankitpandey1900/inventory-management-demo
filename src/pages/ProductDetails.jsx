@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Edit, Package, History } from 'lucide-react';
-import { products } from '../data/mockData';
+import { useAppData } from '../context/AppDataContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const { products } = useAppData();
   const [activeTab, setActiveTab] = useState('overview');
   
   // Find product or fallback to first product

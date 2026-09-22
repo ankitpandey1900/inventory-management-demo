@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { Search, Filter, Printer, Download, Eye, RotateCcw } from 'lucide-react';
-import { salesInvoices } from '../data/mockData';
+import { useAppData } from '../context/AppDataContext';
 
 const SalesInvoices = () => {
+  const { salesInvoices } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredInvoices = salesInvoices.filter(inv => 
+    inv.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    inv.customer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
@@ -15,8 +21,8 @@ const SalesInvoices = () => {
       </div>
 
       <div className="card">
-        <div className="flex justify-between mb-4 gap-4">
-          <div style={{ flex: 1, position: 'relative' }}>
+        <div className="flex justify-between mb-4 gap-4 flex-wrap">
+          <div style={{ flex: 1, position: 'relative', minWidth: '250px' }}>
             <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
@@ -60,7 +66,7 @@ const SalesInvoices = () => {
               </tr>
             </thead>
             <tbody>
-              {salesInvoices.map(inv => (
+              {filteredInvoices.map(inv => (
                 <tr key={inv.id}>
                   <td style={{ fontWeight: 500 }}>{inv.id}</td>
                   <td>{inv.date}</td>
