@@ -370,8 +370,16 @@ p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
     grid-template-columns: 1fr !important;
   }
   
+  /* CRITICAL: Prevent grid items from blowing out the grid width */
+  .grid > * {
+    min-width: 0;
+  }
+  
   .card {
     padding: 1rem;
+    min-width: 0;
+    width: 100%;
+    overflow: hidden; /* prevents contents from expanding card beyond screen */
   }
   
   .table-container {
@@ -381,6 +389,8 @@ p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
     margin-bottom: 1rem;
     border: 1px solid var(--border);
     border-radius: 4px;
+    /* Ensure table container itself can shrink */
+    min-width: 0;
   }
   
   .table {
@@ -395,25 +405,29 @@ p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
   /* Make sure header flex containers stack */
   .flex.justify-between.items-end,
   .flex.justify-between.mb-6,
-  .flex.justify-between.items-center.mb-6 {
+  .flex.justify-between.items-center.mb-6,
+  .flex.items-center.gap-4.mb-6 {
     flex-direction: column;
     align-items: flex-start !important;
     gap: 1rem;
   }
   
-  /* Make sure internal card flex containers stack if they are form actions */
-  .flex.gap-4.mb-6.flex-wrap {
-    flex-direction: column;
+  /* Force toolbars to stack */
+  .flex-wrap {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  /* Strip fixed widths from inputs on mobile */
+  .input, .select, [style*="width: 150px"], [style*="width: 200px"], [style*="minWidth"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
   }
   
   /* Tabs and Steppers and button groups */
   .flex.gap-4, .flex.gap-3 {
     flex-wrap: wrap;
-  }
-
-  .flex.gap-3 > .btn, .flex.gap-4 > .btn {
-    flex: 1;
-    min-width: calc(50% - 1rem);
   }
   
   .modal-content {
@@ -427,6 +441,7 @@ p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
   
   /* Charts overflow */
   .recharts-responsive-container {
-    min-width: 300px;
+    min-width: 0 !important;
+    width: 100% !important;
   }
 }
