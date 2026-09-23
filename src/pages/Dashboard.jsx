@@ -30,7 +30,7 @@ const data = [
 ];
 
 const Dashboard = () => {
-  const { products, transactions, salesInvoices } = useAppData();
+  const { products, transactions, salesInvoices, customers, suppliers } = useAppData();
   const navigate = useNavigate();
   
   const lowStockProducts = products.filter(p => p.stock <= p.reorderLevel).slice(0, 5);
