@@ -4,7 +4,7 @@ import { useAppData } from '../context/AppDataContext';
 import Modal from '../components/Modal';
 
 const NewPurchase = () => {
-  const { products, suppliers, addSupplier } = useAppData();
+  const { products, suppliers, addSupplier, addPurchase } = useAppData();
   
   const [selectedSupplier, setSelectedSupplier] = useState(suppliers[0]?.id || '');
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,6 +66,14 @@ const NewPurchase = () => {
 
   const handleSave = () => {
     if (items.length === 0) return;
+    
+    addPurchase({
+      supplierId: selectedSupplier,
+      items,
+      grandTotal,
+      invoiceNo: `PUR-${Date.now().toString().slice(-6)}`
+    });
+
     setSaveSuccess(true);
     setItems([]);
     setTimeout(() => setSaveSuccess(false), 3000);

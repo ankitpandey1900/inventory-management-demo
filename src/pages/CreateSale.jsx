@@ -92,6 +92,7 @@ const CreateSale = () => {
   const handleAddCustomer = (e) => {
     e.preventDefault();
     if (!newCustName) return;
+    const newId = `c${customers.length + 1}`;
     addCustomer({
       name: newCustName,
       phone: newCustPhone || '-',
@@ -101,6 +102,7 @@ const CreateSale = () => {
       lastPurchase: '-'
     });
     setCustomerModalOpen(false);
+    setSelectedCustomer(newId);
     setNewCustName('');
     setNewCustPhone('');
   };
@@ -280,7 +282,7 @@ const CreateSale = () => {
           <div className="mb-4">
             <label style={{ display: 'block', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Payment Method</label>
             <div className="flex flex-wrap gap-2">
-              {['Cash', 'UPI', 'Bank Transfer', 'Credit'].map(method => (
+              {['Cash', 'UPI', 'Bank Transfer', 'Pay Later'].map(method => (
                 <label key={method} className="flex items-center gap-1" style={{ fontSize: '0.875rem', cursor: 'pointer', marginRight: '1rem' }}>
                   <input 
                     type="radio" 
@@ -289,7 +291,7 @@ const CreateSale = () => {
                     checked={paymentMethod === method}
                     onChange={(e) => {
                       setPaymentMethod(e.target.value);
-                      if (e.target.value === 'Credit') {
+                      if (e.target.value === 'Pay Later') {
                         setAmountPaidInput('0');
                       } else {
                         setAmountPaidInput(totalAmount.toString());

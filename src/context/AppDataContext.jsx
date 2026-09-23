@@ -48,7 +48,7 @@ export const AppDataProvider = ({ children }) => {
       customer: customerName,
       items: sale.items.length,
       amount: sale.total,
-      payment: sale.paymentMethod || (amountPaid > 0 ? 'Mixed' : 'Credit'),
+      payment: sale.paymentMethod || (amountPaid > 0 ? 'Mixed' : 'Pay Later'),
       status: invoiceStatus
     };
     
@@ -89,10 +89,50 @@ export const AppDataProvider = ({ children }) => {
     setProducts(updatedProducts);
   };
 
+  const addPurchase = (purchase) => {
+    const d = new Date();
+    const formattedDate = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+    
+    const supplierObj = suppliers.find(s => s.id === purchase.supplierId);
+    const supplierName = supplierObj?.name || 'Walk-in Supplier';
+
+    setTransactions([{
+      date: formattedDate,
+      type: 'Purchase',
+      invoiceNo: purchase.invoiceNo || `PUR-${Date.now().toString().slice(-6)}`,
+      entity: supplierName,
+      amount: purchase.grandTotal,
+      status: 'Completed'
+    }, ...transactions]);
+
+    if (supplierObj) {
+      const updatedSuppliers = suppliers.map(s => {
+        if (s.id === purchase.supplierId) {
+          return {
+            ...s,
+            purchases: s.purchases + 1,
+            lastPurchase: formattedDate
+          };
+        }
+        return s;
+      });
+      setSuppliers(updatedSuppliers);
+    }
+
+    const updatedProducts = [...products];
+    purchase.items.forEach(item => {
+      const prodIndex = updatedProducts.findIndex(p => p.id === item.product.id);
+      if (prodIndex !== -1) {
+        updatedProducts[prodIndex].stock += item.qty;
+      }
+    });
+    setProducts(updatedProducts);
+  };
+
   return (
     <AppDataContext.Provider value={{
       products, customers, suppliers, salesInvoices, transactions,
-      addProduct, addCustomer, addSupplier, addSale
+      addProduct, addCustomer, addSupplier, addSale, addPurchase
     }}>
       {children}
     </AppDataContext.Provider>
