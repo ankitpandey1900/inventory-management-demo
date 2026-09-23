@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus, Filter } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import Modal from '../components/Modal';
 
@@ -97,9 +98,9 @@ const Suppliers = () => {
                   </td>
                   <td>{s.lastPurchase}</td>
                   <td>
-                    <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                    <Link to={`/suppliers/${s.id}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', textDecoration: 'none' }}>
                       View
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
