@@ -37,6 +37,12 @@ const Dashboard = () => {
 
   const todaySales = salesInvoices.reduce((acc, inv) => acc + inv.amount, 0); // Simplified for demo
   const stockValue = products.reduce((acc, p) => acc + (p.stock * p.purchasePrice), 0);
+  
+  const totalOutstanding = customers.reduce((acc, c) => acc + c.outstanding, 0);
+  const customersWithDues = customers.filter(c => c.outstanding > 0).length;
+
+  const totalSupplierOutstanding = suppliers.reduce((acc, s) => acc + s.outstanding, 0);
+  const suppliersWithDues = suppliers.filter(s => s.outstanding > 0).length;
 
   return (
     <div>
@@ -60,16 +66,16 @@ const Dashboard = () => {
         />
         <SummaryCard 
           title="Customer Outstanding" 
-          value="₹3,42,600" 
-          subtitle="5 customers" 
+          value={`₹${totalOutstanding.toLocaleString()}`} 
+          subtitle={`${customersWithDues} customers`} 
           icon={<Users size={24} color="#f59e0b" />}
           trend="-2%"
           trendUp={false}
         />
         <SummaryCard 
           title="Supplier Outstanding" 
-          value="₹1,28,400" 
-          subtitle="3 suppliers" 
+          value={`₹${totalSupplierOutstanding.toLocaleString()}`} 
+          subtitle={`${suppliersWithDues} suppliers`} 
           icon={<Briefcase size={24} color="#dc2626" />}
         />
       </div>

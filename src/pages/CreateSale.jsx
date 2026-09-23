@@ -19,6 +19,9 @@ const CreateSale = () => {
   const [newCustName, setNewCustName] = useState('');
   const [newCustPhone, setNewCustPhone] = useState('');
 
+  // Payment Tracking
+  const [amountPaidInput, setAmountPaidInput] = useState('');
+
   const searchRef = useRef(null);
 
   useEffect(() => {
@@ -53,6 +56,11 @@ const CreateSale = () => {
   const gst = subtotal * 0.18;
   const totalAmount = subtotal + gst;
 
+  const selectedCustObj = customers.find(c => c.id === selectedCustomer);
+  const previousOutstanding = selectedCustObj && selectedCustObj.id !== 'c1' ? selectedCustObj.outstanding : 0;
+  const amountPaid = amountPaidInput === '' ? totalAmount : (parseFloat(amountPaidInput) || 0);
+  const newOutstanding = previousOutstanding + totalAmount - amountPaid;
+
   const handleQtyChange = (id, newQty) => {
     setItems(items.map(i => i.id === id ? { ...i, qty: parseInt(newQty) || 0 } : i));
   };
@@ -72,6 +80,7 @@ const CreateSale = () => {
       customerId: selectedCustomer,
       items,
       total: totalAmount,
+      amountPaid,
       paymentMethod
     });
 
@@ -249,28 +258,79 @@ const CreateSale = () => {
             <span style={{ fontWeight: 500 }}>₹{gst.toLocaleString()}</span>
           </div>
 
-          <div className="flex justify-between mb-6">
-            <span style={{ fontSize: '1.125rem', fontWeight: 600 }}>Total Amount</span>
-            <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>₹{totalAmount.toLocaleString()}</span>
+          <div className="flex justify-between mb-4">
+            <span style={{ fontSize: '1rem', fontWeight: 600 }}>Invoice Total</span>
+            <span style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-main)' }}>₹{totalAmount.toLocaleString()}</span>
           </div>
 
-          <div className="mb-6">
+          {selectedCustObj && selectedCustObj.id !== 'c1' && (
+            <div className="flex justify-between mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+              <span className="text-muted">Previous Outstanding</span>
+              <span style={{ fontWeight: 600, color: 'var(--danger)' }}>₹{previousOutstanding.toLocaleString()}</span>
+            </div>
+          )}
+
+          {selectedCustObj && selectedCustObj.id !== 'c1' && (
+             <div className="flex justify-between mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+               <span style={{ fontSize: '1rem', fontWeight: 600 }}>Total Due</span>
+               <span style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--danger)' }}>₹{(totalAmount + previousOutstanding).toLocaleString()}</span>
+             </div>
+          )}
+
+          <div className="mb-4">
             <label style={{ display: 'block', marginBottom: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>Payment Method</label>
-            <div className="flex flex-col gap-2">
-              {['Cash', 'UPI', 'Bank Transfer', 'Credit (Customer Account)'].map(method => (
-                <label key={method} className="flex items-center gap-2" style={{ fontSize: '0.875rem', cursor: 'pointer' }}>
+            <div className="flex flex-wrap gap-2">
+              {['Cash', 'UPI', 'Bank Transfer', 'Credit'].map(method => (
+                <label key={method} className="flex items-center gap-1" style={{ fontSize: '0.875rem', cursor: 'pointer', marginRight: '1rem' }}>
                   <input 
                     type="radio" 
                     name="paymentMethod" 
                     value={method} 
                     checked={paymentMethod === method}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    onChange={(e) => {
+                      setPaymentMethod(e.target.value);
+                      if (e.target.value === 'Credit') {
+                        setAmountPaidInput('0');
+                      } else {
+                        setAmountPaidInput(totalAmount.toString());
+                      }
+                    }}
                   />
                   {method}
                 </label>
               ))}
             </div>
           </div>
+
+          <div className="mb-6">
+            <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+              <span>Amount Paid Now (₹)</span>
+              <button 
+                type="button" 
+                onClick={() => setAmountPaidInput(totalAmount.toString())}
+                style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
+              >
+                Pay Full Invoice
+              </button>
+            </label>
+            <input 
+              type="number" 
+              className="input w-full" 
+              placeholder={totalAmount.toString()} 
+              value={amountPaidInput}
+              onChange={(e) => setAmountPaidInput(e.target.value)}
+              min="0"
+            />
+          </div>
+
+          {selectedCustObj && selectedCustObj.id !== 'c1' && (
+            <div className="flex justify-between mb-6 p-3" style={{ backgroundColor: 'var(--bg-color)', borderRadius: '6px' }}>
+              <span style={{ fontWeight: 600 }}>New Balance</span>
+              <span style={{ fontWeight: 700, color: newOutstanding > 0 ? 'var(--danger)' : 'var(--success)' }}>
+                ₹{newOutstanding.toLocaleString()}
+              </span>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3">
             <button 

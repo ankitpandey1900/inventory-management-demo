@@ -32,15 +32,26 @@ export const AppDataProvider = ({ children }) => {
     const d = new Date();
     const formattedDate = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
     
+    const amountPaid = sale.amountPaid !== undefined ? sale.amountPaid : sale.total;
+    const unpaidFromThisSale = sale.total - amountPaid;
+
+    let invoiceStatus = 'Paid';
+    if (amountPaid === 0) invoiceStatus = 'Unpaid';
+    else if (unpaidFromThisSale > 0) invoiceStatus = 'Partial';
+
+    const customerObj = customers.find(c => c.id === sale.customerId);
+    const customerName = customerObj?.name || 'Walk-in';
+
     const newInvoice = {
       id: `INV-00${salesInvoices.length + 1}`,
       date: formattedDate,
-      customer: customers.find(c => c.id === sale.customerId)?.name || 'Walk-in',
+      customer: customerName,
       items: sale.items.length,
       amount: sale.total,
-      payment: sale.paymentMethod,
-      status: 'Paid'
+      payment: sale.paymentMethod || (amountPaid > 0 ? 'Mixed' : 'Credit'),
+      status: invoiceStatus
     };
+    
     setSalesInvoices([newInvoice, ...salesInvoices]);
     setTransactions([{
       date: newInvoice.date,
@@ -48,8 +59,24 @@ export const AppDataProvider = ({ children }) => {
       invoiceNo: newInvoice.id,
       entity: newInvoice.customer,
       amount: newInvoice.amount,
-      status: 'Completed'
+      status: invoiceStatus === 'Unpaid' ? 'Pending' : 'Completed'
     }, ...transactions]);
+
+    // Update Customer Outstanding Balance & Purchases
+    if (customerObj && customerObj.id !== 'c1') {
+      const updatedCustomers = customers.map(c => {
+        if (c.id === sale.customerId) {
+          return {
+            ...c,
+            purchases: c.purchases + 1,
+            outstanding: c.outstanding + unpaidFromThisSale,
+            lastPurchase: formattedDate
+          };
+        }
+        return c;
+      });
+      setCustomers(updatedCustomers);
+    }
 
     // Deduct stock
     const updatedProducts = [...products];

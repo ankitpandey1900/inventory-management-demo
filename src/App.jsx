@@ -6,6 +6,7 @@ import CreateSale from './pages/CreateSale';
 import Inventory from './pages/Inventory';
 import NewPurchase from './pages/NewPurchase';
 import Customers from './pages/Customers';
+import CustomerProfile from './pages/CustomerProfile';
 import Suppliers from './pages/Suppliers';
 import SalesInvoices from './pages/SalesInvoices';
 import Reports from './pages/Reports';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/inventory/product/:id" element={<ProductDetails />} />
             <Route path="/customers" element={<Customers />} />
+            <Route path="/customers/:id" element={<CustomerProfile />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/reports" element={<Reports />} />
