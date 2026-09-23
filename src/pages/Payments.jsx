@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { useAppData } from '../context/AppDataContext';
 
 const Payments = () => {
   const [activeTab, setActiveTab] = useState('received');
+  const { transactions } = useAppData();
+
+  const receivedPayments = transactions.filter(t => t.type === 'Sale' || t.type === 'Payment In');
+  const paidPayments = transactions.filter(t => t.type === 'Purchase' || t.type === 'Payment Out');
 
   return (
     <div>
@@ -38,38 +43,26 @@ const Payments = () => {
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Customer</th>
-                  <th>Invoice</th>
+                  <th>Customer/Entity</th>
+                  <th>Reference No.</th>
                   <th>Amount</th>
-                  <th>Method</th>
-                  <th>Reference</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>21-09-2026</td>
-                  <td style={{ color: 'var(--primary)' }}>Walk-in Customer</td>
-                  <td>INV-001</td>
-                  <td style={{ fontWeight: 600, color: 'var(--success)' }}>₹240</td>
-                  <td>Cash</td>
-                  <td>-</td>
-                </tr>
-                <tr>
-                  <td>20-09-2026</td>
-                  <td style={{ color: 'var(--primary)' }}>Mobile Planet</td>
-                  <td>INV-003</td>
-                  <td style={{ fontWeight: 600, color: 'var(--success)' }}>₹1,200</td>
-                  <td>UPI</td>
-                  <td>UPI/987654321</td>
-                </tr>
-                <tr>
-                  <td>19-09-2026</td>
-                  <td style={{ color: 'var(--primary)' }}>Gadget Hub</td>
-                  <td>INV-004</td>
-                  <td style={{ fontWeight: 600, color: 'var(--success)' }}>₹3,200</td>
-                  <td>Bank Transfer</td>
-                  <td>NEFT/SBIN000123</td>
-                </tr>
+                {receivedPayments.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No received payments recorded yet.</td>
+                  </tr>
+                ) : receivedPayments.map((p, i) => (
+                  <tr key={i}>
+                    <td>{p.date}</td>
+                    <td style={{ color: 'var(--primary)' }}>{p.entity}</td>
+                    <td>{p.invoiceNo}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--success)' }}>₹{p.amount.toLocaleString()}</td>
+                    <td><span className={`badge ${p.status === 'Completed' ? 'badge-success' : 'badge-warning'}`}>{p.status}</span></td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -81,30 +74,26 @@ const Payments = () => {
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Supplier</th>
-                  <th>Purchase</th>
+                  <th>Supplier/Entity</th>
+                  <th>Reference No.</th>
                   <th>Amount</th>
-                  <th>Method</th>
-                  <th>Reference</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>20-09-2026</td>
-                  <td style={{ color: 'var(--primary)' }}>Shree Telecom</td>
-                  <td>PUR-056</td>
-                  <td style={{ fontWeight: 600, color: 'var(--danger)' }}>₹15,000</td>
-                  <td>Bank Transfer</td>
-                  <td>RTGS/HDFC000123</td>
-                </tr>
-                <tr>
-                  <td>15-09-2026</td>
-                  <td style={{ color: 'var(--primary)' }}>Mega Accessories</td>
-                  <td>PUR-050</td>
-                  <td style={{ fontWeight: 600, color: 'var(--danger)' }}>₹8,500</td>
-                  <td>Bank Transfer</td>
-                  <td>IMPS/ICIC000123</td>
-                </tr>
+                {paidPayments.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No outgoing payments recorded yet.</td>
+                  </tr>
+                ) : paidPayments.map((p, i) => (
+                  <tr key={i}>
+                    <td>{p.date}</td>
+                    <td style={{ color: 'var(--primary)' }}>{p.entity}</td>
+                    <td>{p.invoiceNo}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--danger)' }}>₹{p.amount.toLocaleString()}</td>
+                    <td><span className={`badge ${p.status === 'Completed' ? 'badge-success' : 'badge-warning'}`}>{p.status}</span></td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
